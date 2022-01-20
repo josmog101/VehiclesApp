@@ -1,11 +1,14 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, avoid_print
 
 import 'dart:convert';
 import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:http/http.dart' as http;
+import 'package:vehicles_app/components/loader_component.dart';
 import 'package:vehicles_app/helpers/constans.dart';
+import 'package:vehicles_app/models/token.dart';
+import 'package:vehicles_app/screens/home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -15,16 +18,18 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  String _email = '';
+  String _email = 'josue.gm10@gmail.com';
   String _emailError = '';
   bool _emailShowError = false;
 
-  String _password = '';
+  String _password = '123456';
   String _passwordError = '';
   bool _passwordShowError = false;
 
   bool _rememberme = true;
   bool _passwordShow = false;
+
+  bool _showLoader = false;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 SizedBox(
-                  height: 40,
+                  height: 80,
                 ),
                 _showLogo(),
                 SizedBox(
@@ -49,6 +54,11 @@ class _LoginScreenState extends State<LoginScreen> {
               ],
             ),
           ),
+          _showLoader
+              ? LoaderComponet(
+                  text: 'Por favor espere...',
+                )
+              : Container(),
         ],
       ),
     );
@@ -181,16 +191,22 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       _passwordShow = false;
     });
+
     if (!_validateFields()) {
       return;
     }
+
+    setState(() {
+      _showLoader = true;
+    });
 
     Map<String, dynamic> request = {
       'userName': _email,
       'password': _password,
     };
 
-    var url = Uri.parse('${Constans.apiUrl}/api/Account/CreateToken');
+    var url = Uri.parse(
+        '${Constans.apiUrl}?function=CreateToken&access_key=${Constans.accessKey}');
     var response = await http.post(
       url,
       headers: {
@@ -200,7 +216,37 @@ class _LoginScreenState extends State<LoginScreen> {
       body: jsonEncode(request),
     );
 
-    print(response.body);
+    setState(() {
+      _showLoader = false;
+    });
+
+    if (response.statusCode >= 400) {
+      setState(() {
+        _passwordShowError = true;
+        _passwordError = "Email o contraseña incorrectos";
+      });
+      return;
+    }
+
+    var body = response.body;
+    var decodedJson = jsonDecode(body);
+    var token = Token.fromJson(decodedJson);
+    if (token.status == false) {
+      setState(() {
+        _passwordShowError = true;
+        _passwordError = "Email o contraseña incorrectos";
+      });
+      return;
+    }
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HomeScreen(
+          token: token,
+        ),
+      ),
+    );
   }
 
   bool _validateFields() {

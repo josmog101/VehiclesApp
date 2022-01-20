@@ -18,13 +18,18 @@ class Token {
       userName: '',
       email: '',
       phoneNumber: '');
-
-  Token({required this.token, required this.expiration, required this.user});
+  bool status = true;
+  Token(
+      {required this.token,
+      required this.expiration,
+      required this.user,
+      required this.status});
 
   Token.fromJson(Map<String, dynamic> json) {
     token = json['token'];
     expiration = json['expiration'];
     user = User.fromJson(json['user']);
+    status = json['status'];
   }
 
   Map<String, dynamic> toJson() {
@@ -32,6 +37,7 @@ class Token {
     data['token'] = this.token;
     data['expiration'] = this.expiration;
     data['user'] = this.user.toJson();
+    data['status'] = this.status;
     return data;
   }
 }
