@@ -75,8 +75,8 @@ class ApiHelper {
     return Response(isSuccess: true);
   }
 
-  static Future<Response> delete(
-      String controller, String id, String token) async {
+  static Future<Response> delete(String controller, String id,
+      Map<String, dynamic> request, String token) async {
     var url = Uri.parse(
         '${Constans.apiUrl}?function=${controller}&id=${id}&access_key=${Constans.accessKey}');
     var response = await http.delete(
