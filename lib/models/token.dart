@@ -17,7 +17,9 @@ class Token {
       id: '',
       userName: '',
       email: '',
-      phoneNumber: '');
+      phoneNumber: '',
+      vehicles: [],
+      vehiclesCount: 0);
   bool status = true;
   Token(
       {required this.token,

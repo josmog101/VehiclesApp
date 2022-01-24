@@ -1,3 +1,4 @@
+import 'package:vehicles_app/models/vehicle.dart';
 import 'document_type.dart';
 
 class User {
@@ -8,27 +9,32 @@ class User {
   String address = '';
   String imageId = '';
   String imageFullPath = '';
-  int userType = 0;
+  int userType = 1;
   String fullName = '';
+  List<Vehicle> vehicles = [];
+  int vehiclesCount = 0;
   String id = '';
   String userName = '';
   String email = '';
   String phoneNumber = '';
 
-  User(
-      {required this.firstName,
-      required this.lastName,
-      required this.documentType,
-      required this.document,
-      required this.address,
-      required this.imageId,
-      required this.imageFullPath,
-      required this.userType,
-      required this.fullName,
-      required this.id,
-      required this.userName,
-      required this.email,
-      required this.phoneNumber});
+  User({
+    required this.firstName,
+    required this.lastName,
+    required this.documentType,
+    required this.document,
+    required this.address,
+    required this.imageId,
+    required this.imageFullPath,
+    required this.userType,
+    required this.fullName,
+    required this.vehicles,
+    required this.vehiclesCount,
+    required this.id,
+    required this.userName,
+    required this.email,
+    required this.phoneNumber,
+  });
 
   User.fromJson(Map<String, dynamic> json) {
     firstName = json['firstName'];
@@ -40,6 +46,13 @@ class User {
     imageFullPath = json['imageFullPath'];
     userType = json['userType'];
     fullName = json['fullName'];
+    if (json['vehicles'] != null) {
+      vehicles = [];
+      json['vehicles'].forEach((v) {
+        vehicles.add(new Vehicle.fromJson(v));
+      });
+    }
+    vehiclesCount = json['vehiclesCount'];
     id = json['id'];
     userName = json['userName'];
     email = json['email'];
@@ -57,11 +70,12 @@ class User {
     data['imageFullPath'] = this.imageFullPath;
     data['userType'] = this.userType;
     data['fullName'] = this.fullName;
+    data['vehicles'] = this.vehicles.map((v) => v.toJson()).toList();
+    data['vehiclesCount'] = this.vehiclesCount;
     data['id'] = this.id;
     data['userName'] = this.userName;
     data['email'] = this.email;
     data['phoneNumber'] = this.phoneNumber;
-
     return data;
   }
 }
